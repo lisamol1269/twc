@@ -74,6 +74,11 @@ func (c *ChatBot) SendMessage(message string) {
 	fmt.Fprintf(*c.conn, "PRIVMSG #%s :%s\r\n", c.channel, message)
 }
 
+func (c *ChatBot) SendMessagef(format string, a ...interface{}) {
+	message := fmt.Sprintf(format, a...)
+	c.SendMessage(message)
+}
+
 // Used alongside HandleAllCommands()
 func (c *ChatBot) AddCommand(name string, fp func(string)) {
 	cmd := new(Command)
@@ -143,4 +148,12 @@ func GetCommandArgs(name string, rawInput string) []string {
 		return nil
 	}
 	return strings.Split(rawInput[cmdIndex:len(rawInput)-1], " ")
+}
+
+func GetUsername(raw string) string {
+	userIndex := strings.Index(raw, "!")
+	if userIndex == -1 {
+		return ""
+	}
+	return raw[2:userIndex]
 }
