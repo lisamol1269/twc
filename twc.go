@@ -1,4 +1,5 @@
 /* TODO
+update getcommandargs to accept "arg1 still arg 1" as a single argument without the quotes internally
 override the AddCommand() and HandleCommand() functions to accept a function pointer with parameters *ChatBot as well as string
 */
 
@@ -70,8 +71,16 @@ func (c *ChatBot) OnCommand(command string, fp func(string)) {
 	}
 }
 
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
 func (c *ChatBot) SendMessage(message string) {
-	fmt.Fprintf(*c.conn, "PRIVMSG #%s :%s\r\n", c.channel, message)
+	finalMessage := message[:min(500, len(message))] // cut off the final string to 500 characters to comply with twitch character limit.
+	fmt.Fprintf(*c.conn, "PRIVMSG #%s :%s\r\n", c.channel, finalMessage)
 }
 
 func (c *ChatBot) SendMessagef(format string, a ...interface{}) {
